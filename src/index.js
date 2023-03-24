@@ -1,5 +1,5 @@
 import './styles.scss';
 import 'bootstrap';
-import script from './script.js';
+import app from './app.js';
 
-script();
+app();
