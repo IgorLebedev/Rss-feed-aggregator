@@ -1,5 +1,5 @@
 import onChange from 'on-change';
-import validator from './validator.js';
+import validator from '../utils/validator.js';
 import { renderMessage, renderPage } from './view.js';
 
 export default () => {
@@ -28,8 +28,9 @@ export default () => {
       .then(({ url }) => {
         watchedState.feeds.push(url);
         watchedState.error = null;
+        const input = document.getElementById('url-input');
         form.reset();
-        form.focus();
+        input.focus();
       })
       .catch((error) => {
         switch (error.type) {
