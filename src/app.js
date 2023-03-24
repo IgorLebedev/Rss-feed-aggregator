@@ -1,10 +1,9 @@
-import validator from './validator.js';
 import onChange from 'on-change';
+import validator from './validator.js';
 import { renderMessage, renderPage } from './view.js';
 
 export default () => {
   const state = {
-    currentLink: null,
     feeds: [],
     error: null,
   };
