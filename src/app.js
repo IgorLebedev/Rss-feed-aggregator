@@ -1,7 +1,6 @@
-import onChange from 'on-change';
 import i18n from 'i18next';
 import validator from './utils/validator.js';
-import { renderMessage, renderPage } from './view.js';
+import initWatchedState from './view.js';
 import ru from './locales/ru.js';
 
 const initFormListener = (form, state, watchedState) => form.addEventListener('submit', (e) => {
@@ -41,14 +40,7 @@ export default () => {
         error: null,
       };
 
-      const watchedState = onChange(state, (path, value) => {
-        if (path === 'error') {
-          renderMessage(state.isValid, value, i18nInst);
-        }
-        if (path === 'feeds') {
-          renderPage(value);
-        }
-      });
+      const watchedState = initWatchedState(state, i18nInst);
 
       initFormListener(form, state, watchedState);
     });
