@@ -1,6 +1,6 @@
 import onChange from 'on-change';
 
-const renderMessage = (isValid, errorValue, i18nInst) => {
+const renderMessage = (isValid, i18nInst, errorValue) => {
   const messageContainer = document.querySelector('.feedback');
   const urlInput = document.getElementById('url-input');
   switch (isValid) {
@@ -26,9 +26,10 @@ const renderPage = () => {
 
 const initWatchedState = (state, i18nInst) => onChange(state, (path, value) => {
   if (path === 'error') {
-    renderMessage(state.isValid, value, i18nInst);
+    renderMessage(state.isValid, i18nInst, value);
   }
   if (path === 'feeds') {
+    renderMessage(state.isValid, i18nInst);
     renderPage(value);
   }
 });

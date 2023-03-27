@@ -35,7 +35,7 @@ export default () => {
   })
     .then(() => {
       const state = {
-        isValid: true,
+        isValid: null,
         feeds: [],
         error: null,
       };
