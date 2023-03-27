@@ -1,6 +1,6 @@
 import onChange from 'on-change';
 
-const renderMessage = (isValid, value, i18nInst) => {
+const renderMessage = (isValid, errorValue, i18nInst) => {
   const messageContainer = document.querySelector('.feedback');
   const urlInput = document.getElementById('url-input');
   switch (isValid) {
@@ -12,7 +12,7 @@ const renderMessage = (isValid, value, i18nInst) => {
       break;
     case false:
       urlInput.classList.add('is-invalid');
-      messageContainer.textContent = i18nInst.t(`messages.errors.${value}`);
+      messageContainer.textContent = i18nInst.t(`messages.errors.${errorValue}`);
       messageContainer.classList.add('text-danger');
       messageContainer.classList.remove('text-success');
       break;
@@ -24,7 +24,7 @@ const renderMessage = (isValid, value, i18nInst) => {
 const renderPage = () => {
 };
 
-export default (state, i18nInst) => onChange(state, (path, value) => {
+const initWatchedState = (state, i18nInst) => onChange(state, (path, value) => {
   if (path === 'error') {
     renderMessage(state.isValid, value, i18nInst);
   }
@@ -32,3 +32,5 @@ export default (state, i18nInst) => onChange(state, (path, value) => {
     renderPage(value);
   }
 });
+
+export default initWatchedState;
