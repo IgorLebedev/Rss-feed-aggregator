@@ -1,3 +1,5 @@
+import onChange from 'on-change';
+
 const renderMessage = (isValid, value, i18nInst) => {
   const messageContainer = document.querySelector('.feedback');
   const urlInput = document.getElementById('url-input');
@@ -22,4 +24,11 @@ const renderMessage = (isValid, value, i18nInst) => {
 const renderPage = () => {
 };
 
-export { renderMessage, renderPage };
+export default (state, i18nInst) => onChange(state, (path, value) => {
+  if (path === 'error') {
+    renderMessage(state.isValid, value, i18nInst);
+  }
+  if (path === 'feeds') {
+    renderPage(value);
+  }
+});
