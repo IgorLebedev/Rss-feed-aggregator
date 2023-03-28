@@ -1,4 +1,4 @@
-import i18n, { t } from 'i18next';
+import i18n from 'i18next';
 import axios from 'axios';
 import xmlParser from './utils/xmlParser.js';
 import validator from './utils/validator.js';
@@ -21,11 +21,9 @@ const initFormListener = (form, state, watchedState) => form.addEventListener('s
     })
     .then((correctUrl) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(correctUrl)}`))
     .then((response) => {
-      const parsed = xmlParser(response.data.contents);
-      console.log(parsed)
+      xmlParser(response.data.contents);
     })
     .catch((error) => {
-      console.log(error)
       watchedState.isValid = false;
       watchedState.error = error.message;
     });
