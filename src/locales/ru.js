@@ -2,8 +2,10 @@ export default {
   translation: {
     messages: {
       errors: {
-        url: 'Ссылка должна быть валидным URL',
-        notOneOf: 'RSS уже существует',
+        'Incorrect Url': 'Ссылка должна быть валидным URL',
+        'Already Exists': 'RSS уже существует',
+        'Network Error': 'Ошибка сети',
+        'Invalid RSS': 'Ресурс не содержит валидный RSS',
       },
       success: 'RSS успешно загружен',
     },

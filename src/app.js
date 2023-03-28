@@ -1,4 +1,6 @@
-import i18n from 'i18next';
+import i18n, { t } from 'i18next';
+import axios from 'axios';
+import xmlParser from './utils/xmlParser.js';
 import validator from './utils/validator.js';
 import initWatchedState from './view.js';
 import ru from './locales/ru.js';
@@ -7,19 +9,25 @@ const initFormListener = (form, state, watchedState) => form.addEventListener('s
   e.preventDefault();
   const formData = new FormData(e.target);
   const inputValue = formData.get('url');
-  const urlObj = { url: inputValue };
-  validator(urlObj, state.feeds)
-    .then(({ url }) => {
+  validator(inputValue, state.feeds)
+    .then((correctUrl) => {
       watchedState.isValid = true;
-      watchedState.feeds.push(url);
+      watchedState.feeds.push(correctUrl);
       watchedState.error = null;
       const input = document.getElementById('url-input');
       form.reset();
       input.focus();
+      return correctUrl;
+    })
+    .then((correctUrl) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(correctUrl)}`))
+    .then((response) => {
+      const parsed = xmlParser(response.data.contents);
+      console.log(parsed)
     })
     .catch((error) => {
+      console.log(error)
       watchedState.isValid = false;
-      watchedState.error = error.type;
+      watchedState.error = error.message;
     });
 });
 
