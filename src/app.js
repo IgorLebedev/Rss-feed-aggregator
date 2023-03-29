@@ -15,8 +15,8 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
   validator(inputValue, activeUrls)
     .then(() => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(inputValue)}`))
     .then((response) => {
-      const parsed = xmlParser(response.data.contents);
-      rssStateBuilder(inputValue, parsed, watchedState);
+      const parsedRss = xmlParser(response.data.contents);
+      rssStateBuilder(inputValue, parsedRss, watchedState);
       const input = document.getElementById('url-input');
       form.reset();
       input.focus();

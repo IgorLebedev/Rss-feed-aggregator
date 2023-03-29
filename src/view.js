@@ -7,6 +7,7 @@ const processHandler = (process, i18nInst, state) => {
   const urlInput = document.getElementById('url-input');
   const errorMessage = state.error;
   const rssData = state.rss;
+
   switch (process) {
     case 'processing':
       urlInput.classList.remove('is-invalid');
