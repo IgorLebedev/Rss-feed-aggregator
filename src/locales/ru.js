@@ -12,6 +12,7 @@ export default {
         'Network Error': 'Ошибка сети',
         'Invalid RSS': 'Ресурс не содержит валидный RSS',
         'Incorrect RSS': 'Неизвестная ошибка. Что-то пошло не так',
+        'Empty field': 'Не должно быть пустым',
       },
       success: 'RSS успешно загружен',
     },
