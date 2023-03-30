@@ -6,7 +6,7 @@ const processHandler = (process, i18nInst, state) => {
   const messageContainer = document.querySelector('.feedback');
   const urlInput = document.getElementById('url-input');
   const errorMessage = state.error;
-  const rssData = state.rss;
+  const { rssData } = state;
   const button = document.querySelector('[type="submit"]');
 
   switch (process) {
@@ -19,7 +19,7 @@ const processHandler = (process, i18nInst, state) => {
       break;
     case 'success':
       renderFeeds(rssData.feeds, i18nInst);
-      renderPosts(rssData.posts, i18nInst);
+      renderPosts(state, i18nInst);
       urlInput.classList.remove('is-invalid');
       messageContainer.textContent = i18nInst.t('messages.success');
       messageContainer.classList.add('text-success');
