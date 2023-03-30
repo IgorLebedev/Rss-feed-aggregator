@@ -5,6 +5,6 @@ export default (url, stateUrls) => {
     .string()
     .url('Incorrect Url')
     .notOneOf(stateUrls, 'Already Exists')
-    .required();
+    .required('Empty field');
   return schema.validate(url);
 };
