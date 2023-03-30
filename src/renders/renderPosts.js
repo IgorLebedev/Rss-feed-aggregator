@@ -40,7 +40,7 @@ export default (posts, i18nInst) => {
 
     li.append(a);
     li.append(button);
-    ul.prepend(li);
+    ul.append(li);
   });
 
   postsContainer.append(mainCard);
