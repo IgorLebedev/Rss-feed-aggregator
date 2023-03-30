@@ -1,10 +1,18 @@
 import i18n from 'i18next';
-import axios from 'axios';
+import _ from 'lodash';
+import getter from './utils/getter.js';
 import xmlParser from './utils/xmlParser.js';
 import validator from './utils/validator.js';
 import rssStateBuilder from './utils/rssStateBuilder.js';
 import initWatchedState from './view.js';
+import updater from './utils/postsUpdater.js';
 import ru from './locales/ru.js';
+
+const idAdder = (feed, posts) => {
+  const feedWithId = { id: _.uniqueId(), ...feed };
+  const postsWithIds = posts.map((post) => ({ feedId: feedWithId.id, id: _.uniqueId(), ...post }));
+  return [feedWithId, postsWithIds];
+};
 
 const initFormListener = (form, watchedState) => form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -13,10 +21,14 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
   const inputValue = formData.get('url');
   const activeUrls = watchedState.rss.feeds.map(({ url }) => url);
   validator(inputValue, activeUrls)
-    .then(() => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(inputValue)}`))
+    .then(() => getter(inputValue))
     .then((response) => {
       const parsedRss = xmlParser(response.data.contents);
-      rssStateBuilder(inputValue, parsedRss, watchedState);
+      const [feed, posts] = rssStateBuilder(inputValue, parsedRss);
+      const [feedWithId, postsWithIds] = idAdder(feed, posts);
+      watchedState.rss.feeds.push(feedWithId);
+      watchedState.rss.posts.push(...postsWithIds);
+      updater(inputValue, watchedState, feedWithId.id);
       const input = document.getElementById('url-input');
       form.reset();
       input.focus();
