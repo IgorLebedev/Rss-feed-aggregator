@@ -7,7 +7,7 @@ const updater = (currentUrl, watchedState, currentfeedId) => setTimeout(() => ge
   .then((response) => {
     watchedState.process = 'updating';
     const parsedRss = xmlParser(response.data.contents);
-    const oldPosts = watchedState.rss.posts;
+    const oldPosts = watchedState.rssData.posts;
     const filteredById = oldPosts.filter(({ feedId }) => feedId === currentfeedId);
     const [, postsArr] = rssStateBuilder(currentUrl, parsedRss);
     const comparator = (arrayValue, otherValue) => arrayValue.title === otherValue.title;
