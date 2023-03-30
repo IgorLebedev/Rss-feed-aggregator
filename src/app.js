@@ -19,15 +19,18 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
   watchedState.process = 'processing';
   const formData = new FormData(e.target);
   const inputValue = formData.get('url');
-  const activeUrls = watchedState.rss.feeds.map(({ url }) => url);
+  const activeUrls = watchedState.rssData.feeds.map(({ url }) => url);
   validator(inputValue, activeUrls)
     .then(() => getter(inputValue))
     .then((response) => {
       const parsedRss = xmlParser(response.data.contents);
       const [feed, posts] = rssStateBuilder(inputValue, parsedRss);
       const [feedWithId, postsWithIds] = idAdder(feed, posts);
-      watchedState.rss.feeds.push(feedWithId);
-      watchedState.rss.posts.push(...postsWithIds);
+      watchedState.rssData.feeds.push(feedWithId);
+      watchedState.rssData.posts.push(...postsWithIds);
+      postsWithIds.forEach(({ id }) => {
+        watchedState.uiState[id] = 'unread';
+      });
       updater(inputValue, watchedState, feedWithId.id);
       const input = document.getElementById('url-input');
       form.reset();
@@ -44,10 +47,11 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
 export default () => {
   const state = {
     process: null,
-    rss: {
+    rssData: {
       feeds: [],
       posts: [],
     },
+    uiState: {},
     error: null,
   };
 
