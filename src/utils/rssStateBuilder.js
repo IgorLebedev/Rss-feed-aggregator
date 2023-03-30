@@ -1,27 +1,19 @@
-import _ from 'lodash';
-
-export default (url, rss, state) => {
-  const { feeds } = state.rss;
-  const { posts } = state.rss;
-
+export default (url, rss) => {
   try {
     const feedObj = {
       url,
+      lastUpdate: rss.querySelector('pubDate').textContent,
       title: rss.querySelector('title').textContent,
       description: rss.querySelector('description').textContent,
     };
-    feeds.push(feedObj);
 
     const postsFromRss = rss.querySelectorAll('item');
-    postsFromRss.forEach((post) => {
-      const postObj = {
-        id: _.uniqueId(),
-        title: post.querySelector('title').textContent,
-        link: post.querySelector('link').textContent,
-        description: post.querySelector('description').textContent,
-      };
-      posts.push(postObj);
-    });
+    const postsArr = Array.from(postsFromRss).map((post) => ({
+      title: post.querySelector('title').textContent,
+      link: post.querySelector('link').textContent,
+      description: post.querySelector('description').textContent,
+    }));
+    return [feedObj, postsArr];
   } catch {
     throw new Error('Incorrect RSS');
   }
