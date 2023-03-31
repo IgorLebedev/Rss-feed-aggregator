@@ -12,6 +12,9 @@ const processHandler = (process, i18nInst, state) => {
   switch (process) {
     case 'updating':
       break;
+    case 'updated':
+      renderPosts(state, i18nInst);
+      break;
     case 'processing':
       urlInput.classList.remove('is-invalid');
       messageContainer.textContent = '';

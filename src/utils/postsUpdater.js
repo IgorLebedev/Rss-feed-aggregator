@@ -20,7 +20,7 @@ const updater = (currentUrl, watchedState, currentfeedId) => setTimeout(() => ge
     if (newPostsWithIds.length > 0) {
       oldPosts.unshift(...newPostsWithIds);
     }
-    watchedState.process = 'success';
+    watchedState.process = 'updated';
   })
   .then(() => updater(currentUrl, watchedState, currentfeedId))
   .catch((e) => {
