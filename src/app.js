@@ -27,7 +27,7 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
       const [feed, posts] = rssStateBuilder(inputValue, parsedRss);
       const [feedWithId, postsWithIds] = idAdder(feed, posts);
       watchedState.rssData.feeds.push(feedWithId);
-      watchedState.rssData.posts.push(...postsWithIds);
+      watchedState.rssData.posts.unshift(...postsWithIds);
       postsWithIds.forEach(({ id }) => {
         watchedState.uiState[id] = 'unread';
       });
