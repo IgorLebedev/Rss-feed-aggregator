@@ -1,14 +1,23 @@
 import i18n from 'i18next';
+import * as Yup from 'yup';
 import _ from 'lodash';
 import getter from './utils/getter.js';
 import xmlParser from './utils/xmlParser.js';
-import validator from './utils/validator.js';
 import rssStateBuilder from './utils/rssStateBuilder.js';
 import initWatchedState from './view.js';
 import updater from './utils/postsUpdater.js';
 import ru from './locales/ru.js';
 
-const idAdder = (feed, posts) => {
+const validator = (url, stateUrls) => {
+  const schema = Yup
+    .string()
+    .url('Incorrect Url')
+    .notOneOf(stateUrls, 'Already Exists')
+    .required('Empty field');
+  return schema.validate(url);
+};
+
+const addId = (feed, posts) => {
   const feedWithId = { id: _.uniqueId(), ...feed };
   const postsWithIds = posts.map((post) => ({ feedId: feedWithId.id, id: _.uniqueId(), ...post }));
   return [feedWithId, postsWithIds];
@@ -25,7 +34,7 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
     .then((response) => {
       const parsedRss = xmlParser(response.data.contents);
       const [feed, posts] = rssStateBuilder(inputValue, parsedRss);
-      const [feedWithId, postsWithIds] = idAdder(feed, posts);
+      const [feedWithId, postsWithIds] = addId(feed, posts);
       watchedState.rssData.feeds.push(feedWithId);
       watchedState.rssData.posts.unshift(...postsWithIds);
       postsWithIds.forEach(({ id }) => {
