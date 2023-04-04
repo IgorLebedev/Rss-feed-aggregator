@@ -1,11 +1,10 @@
 import i18n from 'i18next';
 import * as Yup from 'yup';
 import _ from 'lodash';
-import getter from './utils/getter.js';
 import xmlParser from './utils/xmlParser.js';
 import rssStateBuilder from './utils/rssStateBuilder.js';
 import initWatchedState from './view.js';
-import updater from './utils/postsUpdater.js';
+import { updater, getter } from './utils/networking.js';
 import ru from './locales/ru.js';
 
 const validator = (url, stateUrls) => {
@@ -16,6 +15,9 @@ const validator = (url, stateUrls) => {
     .required('Empty field');
   return schema.validate(url);
 };
+
+const timeoutWrapper = (fn, time) => setTimeout(() => fn()
+  .then(timeoutWrapper(fn)), time);
 
 const addId = (feed, posts) => {
   const feedWithId = { id: _.uniqueId(), ...feed };
@@ -30,6 +32,12 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
   const inputValue = formData.get('url');
   const activeUrls = watchedState.rssData.feeds.map(({ url }) => url);
   validator(inputValue, activeUrls)
+    .then(watchedState.validationProcess = 'valid')
+    .catch((error) => {
+      watchedState.error = error.message;
+      watchedState.validationProcess = 'error';
+      throw error;
+    })
     .then(() => getter(inputValue))
     .then((response) => {
       const parsedRss = xmlParser(response.data.contents);
@@ -40,7 +48,7 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
       postsWithIds.forEach(({ id }) => {
         watchedState.uiState[id] = 'unread';
       });
-      updater(inputValue, watchedState, feedWithId.id);
+      timeoutWrapper(() => updater(inputValue, watchedState, feedWithId.id), 5000);
       const input = document.getElementById('url-input');
       form.reset();
       input.focus();
@@ -56,6 +64,7 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
 export default () => {
   const state = {
     process: null,
+    formValidation: null,
     rssData: {
       feeds: [],
       posts: [],
