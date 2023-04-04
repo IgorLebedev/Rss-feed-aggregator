@@ -131,9 +131,11 @@ const processHandler = (process, i18nInst, state) => {
       renderPosts(state, i18nInst);
       break;
     case 'processing':
+    case 'valid':
       urlInput.classList.remove('is-invalid');
       messageContainer.textContent = '';
       button.disabled = true;
+      urlInput.setAttribute('readOnly', true);
       break;
     case 'success':
       renderFeeds(rssData.feeds, i18nInst);
@@ -143,6 +145,7 @@ const processHandler = (process, i18nInst, state) => {
       messageContainer.classList.add('text-success');
       messageContainer.classList.remove('text-danger');
       button.disabled = false;
+      urlInput.removeAttribute('readOnly');
       break;
     case 'error':
       urlInput.classList.add('is-invalid');
@@ -150,6 +153,7 @@ const processHandler = (process, i18nInst, state) => {
       messageContainer.classList.add('text-danger');
       messageContainer.classList.remove('text-success');
       button.disabled = false;
+      urlInput.removeAttribute('readOnly');
       break;
     default:
       throw new Error(`Unexpected state: ${process}`);
@@ -158,6 +162,8 @@ const processHandler = (process, i18nInst, state) => {
 
 const initWatchedState = (state, i18nInst) => onChange(state, (path, value) => {
   if (path === 'process') {
+    processHandler(value, i18nInst, state);
+  } else if (path === 'formValidation') {
     processHandler(value, i18nInst, state);
   }
 });
