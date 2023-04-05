@@ -161,7 +161,7 @@ const processHandler = (process, i18nInst, state) => {
 };
 
 const initWatchedState = (state, i18nInst) => onChange(state, (path, value) => {
-  if (path === 'process') {
+  if (path === 'parsingProcess') {
     processHandler(value, i18nInst, state);
   } else if (path === 'formValidation') {
     processHandler(value, i18nInst, state);

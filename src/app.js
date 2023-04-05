@@ -1,8 +1,7 @@
 import i18n from 'i18next';
 import * as Yup from 'yup';
 import _ from 'lodash';
-import xmlParser from './utils/xmlParser.js';
-import rssStateBuilder from './utils/rssStateBuilder.js';
+import { xmlParser, rssStateBuilder } from './utils/parsing.js';
 import initWatchedState from './view.js';
 import { updater, getter } from './utils/networking.js';
 import ru from './locales/ru.js';
@@ -27,15 +26,15 @@ const addId = (feed, posts) => {
 
 const initFormListener = (form, watchedState) => form.addEventListener('submit', (e) => {
   e.preventDefault();
-  watchedState.process = 'processing';
+  watchedState.parsingProcess = 'processing';
   const formData = new FormData(e.target);
   const inputValue = formData.get('url');
   const activeUrls = watchedState.rssData.feeds.map(({ url }) => url);
   validator(inputValue, activeUrls)
-    .then(watchedState.validationProcess = 'valid')
+    .then(watchedState.formValidation = 'valid')
     .catch((error) => {
       watchedState.error = error.message;
-      watchedState.validationProcess = 'error';
+      watchedState.formValidation = 'error';
       throw error;
     })
     .then(() => getter(inputValue))
@@ -53,17 +52,17 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
       form.reset();
       input.focus();
       watchedState.error = null;
-      watchedState.process = 'success';
+      watchedState.parsingProcess = 'success';
     })
     .catch((error) => {
       watchedState.error = error.message;
-      watchedState.process = 'error';
+      watchedState.parsingProcess = 'error';
     });
 });
 
 export default () => {
   const state = {
-    process: null,
+    parsingProcess: null,
     formValidation: null,
     rssData: {
       feeds: [],
@@ -87,3 +86,5 @@ export default () => {
       initFormListener(form, watchedState);
     });
 };
+
+console.log('Hello, World!');
