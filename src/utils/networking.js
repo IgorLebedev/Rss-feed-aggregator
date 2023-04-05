@@ -6,7 +6,7 @@ export const getter = (url) => axios.get(`https://allorigins.hexlet.app/get?disa
 
 export const updater = (currentUrl, watchedState, currentfeedId) => getter(currentUrl)
   .then((response) => {
-    watchedState.process = 'updating';
+    watchedState.parsingProcess = 'updating';
     const parsedRss = xmlParser(response.data.contents);
     const oldPosts = watchedState.rssData.posts;
     const filteredById = oldPosts.filter(({ feedId }) => feedId === currentfeedId);
@@ -21,9 +21,8 @@ export const updater = (currentUrl, watchedState, currentfeedId) => getter(curre
     if (newPostsWithIds.length > 0) {
       oldPosts.unshift(...newPostsWithIds);
     }
-    watchedState.process = 'updated';
+    watchedState.parsingProcess = 'updated';
   })
-  .then(() => updater(currentUrl, watchedState, currentfeedId))
   .catch((e) => {
     throw new Error(e);
   });
