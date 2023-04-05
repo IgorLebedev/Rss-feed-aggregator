@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import axios from 'axios';
-import xmlParser from './xmlParser.js';
-import rssStateBuilder from './rssStateBuilder.js';
+import { xmlParser, rssStateBuilder } from './parsing.js';
 
 export const getter = (url) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`);
 
