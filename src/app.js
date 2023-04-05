@@ -16,7 +16,7 @@ const validator = (url, stateUrls) => {
 };
 
 const timeoutWrapper = (fn, time) => setTimeout(() => fn()
-  .then(timeoutWrapper(fn)), time);
+  .then(timeoutWrapper(fn, time)), time);
 
 const addId = (feed, posts) => {
   const feedWithId = { id: _.uniqueId(), ...feed };
@@ -86,5 +86,3 @@ export default () => {
       initFormListener(form, watchedState);
     });
 };
-
-console.log('Hello, World!');
