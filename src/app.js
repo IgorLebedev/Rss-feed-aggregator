@@ -70,8 +70,10 @@ export default () => {
       feeds: [],
       posts: [],
     },
-    uiProcess: null,
-    uiState: [],
+    uiState: {
+      isButtonCLicked: null,
+      readLinks: [],
+    },
     error: null,
   };
 
