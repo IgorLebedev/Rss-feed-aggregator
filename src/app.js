@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import * as Yup from 'yup';
 import _ from 'lodash';
-import { xmlParser, rssStateBuilder } from './utils/parsing.js';
+import { xmlParser, feedStateBuilder, postsStateBuilder } from './utils/parsing.js';
 import initWatchedState from './view.js';
 import { updater, getter } from './utils/networking.js';
 import ru from './locales/ru.js';
@@ -20,13 +20,13 @@ const timeoutWrapper = (fn, time) => setTimeout(() => fn()
 
 const addId = (feed, posts) => {
   const feedWithId = { id: _.uniqueId(), ...feed };
-  const postsWithIds = posts.map((post) => ({ feedId: feedWithId.id, id: _.uniqueId(), ...post }));
+  const postsWithIds = posts.map((post) => ({ id: _.uniqueId(), ...post }));
   return [feedWithId, postsWithIds];
 };
 
 const initFormListener = (form, watchedState) => form.addEventListener('submit', (e) => {
   e.preventDefault();
-  watchedState.parsingProcess = 'processing';
+  watchedState.addingFeedProcess = 'processing';
   const formData = new FormData(e.target);
   const inputValue = formData.get('url');
   const activeUrls = watchedState.rssData.feeds.map(({ url }) => url);
@@ -40,35 +40,38 @@ const initFormListener = (form, watchedState) => form.addEventListener('submit',
     .then(() => getter(inputValue))
     .then((response) => {
       const parsedRss = xmlParser(response.data.contents);
-      const [feed, posts] = rssStateBuilder(inputValue, parsedRss);
+      const feed = feedStateBuilder(inputValue, parsedRss);
+      const posts = postsStateBuilder(parsedRss);
       const [feedWithId, postsWithIds] = addId(feed, posts);
       watchedState.rssData.feeds.push(feedWithId);
       watchedState.rssData.posts.unshift(...postsWithIds);
-      postsWithIds.forEach(({ id }) => {
-        watchedState.uiState[id] = 'unread';
-      });
-      timeoutWrapper(() => updater(inputValue, watchedState, feedWithId.id), 5000);
+      if (watchedState.updatingProcess === null) {
+        timeoutWrapper(() => updater(watchedState), 5000);
+        watchedState.updatingProcess = 'updating';
+      }
       const input = document.getElementById('url-input');
       form.reset();
       input.focus();
       watchedState.error = null;
-      watchedState.parsingProcess = 'success';
+      watchedState.addingFeedProcess = 'success';
     })
     .catch((error) => {
       watchedState.error = error.message;
-      watchedState.parsingProcess = 'error';
+      watchedState.addingFeedProcess = 'error';
     });
 });
 
 export default () => {
   const state = {
-    parsingProcess: null,
+    addingFeedProcess: null,
     formValidation: null,
+    updatingProcess: null,
     rssData: {
       feeds: [],
       posts: [],
     },
-    uiState: {},
+    uiProcess: null,
+    uiState: [],
     error: null,
   };
 
