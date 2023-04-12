@@ -85,13 +85,12 @@ const renderPosts = (watchedState, i18nInst) => {
     a.setAttribute('rel', 'noopener');
     a.setAttribute('rel', 'noreferrer');
     a.textContent = post.title;
-    if (uiState[post.id] === 'read') {
+    if (uiState.readLinks.includes(post.id)) {
       a.classList.add('fw-normal', 'link-secondary');
     } else { a.classList.add('fw-bold'); }
 
     a.addEventListener('click', () => {
-      uiState[post.id] = 'read';
-      renderPosts(watchedState, i18nInst);
+      uiState.readLinks.push(post.id);
     });
 
     const button = document.createElement('button');
@@ -103,9 +102,9 @@ const renderPosts = (watchedState, i18nInst) => {
     button.textContent = i18nInst.t('buttons.view');
 
     button.addEventListener('click', () => {
-      uiState[post.id] = 'read';
-      renderPosts(watchedState, i18nInst);
-      renderModal(post, watchedState);
+      uiState.isButtonCLicked = true;
+      uiState.readLinks.push(post.id);
+      uiState.isButtonCLicked = false;
     });
 
     li.append(a);
@@ -117,18 +116,18 @@ const renderPosts = (watchedState, i18nInst) => {
   postsContainer.append(ul);
 };
 
-const processHandler = (process, i18nInst, state) => {
+const processHandler = (process, i18nInst, watchedState) => {
   const messageContainer = document.querySelector('.feedback');
   const urlInput = document.getElementById('url-input');
-  const errorMessage = state.error;
-  const { rssData } = state;
+  const errorMessage = watchedState.error;
+  const { rssData } = watchedState;
   const button = document.querySelector('[type="submit"]');
 
   switch (process) {
     case 'updating':
       break;
     case 'updated':
-      renderPosts(state, i18nInst);
+      renderPosts(watchedState, i18nInst);
       break;
     case 'processing':
     case 'valid':
@@ -139,7 +138,7 @@ const processHandler = (process, i18nInst, state) => {
       break;
     case 'success':
       renderFeeds(rssData.feeds, i18nInst);
-      renderPosts(state, i18nInst);
+      renderPosts(watchedState, i18nInst);
       urlInput.classList.remove('is-invalid');
       messageContainer.textContent = i18nInst.t('messages.success');
       messageContainer.classList.add('text-success');
@@ -160,12 +159,29 @@ const processHandler = (process, i18nInst, state) => {
   }
 };
 
-const initWatchedState = (state, i18nInst) => onChange(state, (path, value) => {
-  if (path === 'parsingProcess') {
-    processHandler(value, i18nInst, state);
-  } else if (path === 'formValidation') {
-    processHandler(value, i18nInst, state);
-  }
-});
+const uiStateHandler = (value, i18nInst, watchedState) => {
+  if (watchedState.uiState.isButtonCLicked) {
+    const postsList = watchedState.rssData.posts;
+    const currentId = value[value.length - 1];
+    const currentPost = postsList.find((post) => post.id === `${currentId}`);
+    renderPosts(watchedState, i18nInst);
+    renderModal(currentPost);
+  } else { renderPosts(watchedState, i18nInst); }
+};
+
+const initWatchedState = (state, i18nInst) => {
+  const watchedState = onChange(state, (path, value) => {
+    if (path === 'addingFeedProcess') {
+      processHandler(value, i18nInst, watchedState);
+    } else if (path === 'formValidation') {
+      processHandler(value, i18nInst, watchedState);
+    } else if (path === 'updatingProcess') {
+      processHandler(value, i18nInst, watchedState);
+    } else if (path === 'uiState.readLinks') {
+      uiStateHandler(value, i18nInst, watchedState);
+    }
+  });
+  return watchedState;
+};
 
 export default initWatchedState;
