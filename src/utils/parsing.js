@@ -7,22 +7,27 @@ export const xmlParser = (data) => {
   return result;
 };
 
-export const rssStateBuilder = (url, rss) => {
+export const feedStateBuilder = (url, rss) => {
   try {
-    const feedObj = {
+    return {
       url,
-      lastUpdate: rss.querySelector('pubDate').textContent,
       title: rss.querySelector('title').textContent,
       description: rss.querySelector('description').textContent,
     };
+  } catch {
+    throw new Error('Incorrect RSS');
+  }
+};
 
+export const postsStateBuilder = (rss) => {
+  try {
     const postsFromRss = rss.querySelectorAll('item');
     const postsArr = Array.from(postsFromRss).map((post) => ({
       title: post.querySelector('title').textContent,
       link: post.querySelector('link').textContent,
       description: post.querySelector('description').textContent,
     }));
-    return [feedObj, postsArr];
+    return postsArr;
   } catch {
     throw new Error('Incorrect RSS');
   }
