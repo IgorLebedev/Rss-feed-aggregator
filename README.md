@@ -27,7 +27,7 @@
 
  1. Clone project
 
-        git@github.com:IgorLebedev/frontend-project-46.git
+        git clone git@github.com:IgorLebedev/frontend-project-46.git
 2. Install dependencies
 
         make install
